@@ -22,7 +22,8 @@
   },
   "homepage": "https://github.com/jn4624/reliable-financial-backend#readme",
   "dependencies": {
-    "fastify": "^5.12.8"
+    "fastify": "^5.12.8",
+    "viem": "^2.57.16"
   },
   "devDependencies": {
     "@types/node": "^26.6.6",
