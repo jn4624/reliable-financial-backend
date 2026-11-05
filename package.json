@@ -7,6 +7,7 @@
     "test": "vitest run",
     "dev": "tsx watch src/api/main.ts",
     "start": "tsx src/api/main.ts",
+    "demo:chain-first-crash": "tsx src/demo/chain-first-crash-server.ts",
     "test:watch": "vitest"
   },
   "repository": {
@@ -23,6 +24,7 @@
   "homepage": "https://github.com/jn4624/reliable-financial-backend#readme",
   "dependencies": {
     "fastify": "^5.12.8",
+    "pg": "^8.23.1",
     "viem": "^2.57.16"
   },
   "devDependencies": {
