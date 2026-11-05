@@ -1,9 +1,11 @@
 import Fastify from "fastify";
 import {type ChainProbe, ChainUnavailableError} from "../application/chain-probe";
 import {DemoChainProbe} from "../infrastructure/chain/demo-chain-probe";
+import {CreatePayout} from "../application/create-payout-now";
 
 type BuildAppOptions = {
     chainProbe?: ChainProbe;
+    createPayout?: CreatePayout;
 };
 
 export function buildApp(options: BuildAppOptions = {}) {
@@ -32,6 +34,30 @@ export function buildApp(options: BuildAppOptions = {}) {
 
             throw error;
         }
+    });
+
+    app.post("/payouts", async (request, reply) => {
+        if (!options.createPayout) {
+            return reply.code(503).send({code: "PAYOUTS_NOT_READY"});
+        }
+
+        const body = request.body as {
+            merchantId: string;
+            recipientAddress: string;
+            amount: string;
+        };
+        const idempotencyKey = request.headers["idempotency-key"];
+
+        if (typeof idempotencyKey !== "string") {
+            return reply.code(400).send({code: "VALIDATION_ERROR"});
+        }
+
+        const payout = await options.createPayout.execute({
+            ...body,
+            idempotencyKey
+        });
+
+        return reply.code(202).send({payout})
     });
 
     return app;
