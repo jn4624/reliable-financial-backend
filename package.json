@@ -23,7 +23,9 @@
   },
   "homepage": "https://github.com/jn4624/reliable-financial-backend#readme",
   "dependencies": {
+    "bullmq": "^6.7.2",
     "fastify": "^5.12.8",
+    "ioredis": "^6.0.0",
     "pg": "^8.23.1",
     "viem": "^2.57.16"
   },
