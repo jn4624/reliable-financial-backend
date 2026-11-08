@@ -45,3 +45,11 @@ CREATE TABLE payout_dispatches (
     status text NOT NULL CHECK (status = 'STARTED'),
     created_at timestamptz NOT NULL DEFAULT NOW()
 );
+
+CREATE TABLE processed_messages (
+    consumer_name text NOT NULL,
+    message_id text NOT NULL,
+    payout_id text NOT NULL REFERENCES payouts(id),
+    processed_at timestamptz NOT NULL DEFAULT NOW(),
+    PRIMARY KEY (consumer_name, message_id)
+);

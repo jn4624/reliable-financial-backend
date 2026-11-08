@@ -1,16 +1,25 @@
-import type {PayoutDispatchStore} from "../application/payout-requested-consumer";
+import type {PayoutRequestedProcessingStore} from "../application/payout-requested-consumer";
 
-export class InMemoryPayoutDispatchStore implements PayoutDispatchStore {
+export class InMemoryPayoutDispatchStore implements PayoutRequestedProcessingStore {
     private readonly payoutIds = new Set<string>();
+    private readonly messageIds = new Set<string>();
 
-    async startOnce(payoutId: string): Promise<boolean> {
-        if (this.payoutIds.has(payoutId)) return false;
+    async processOnce(input: {
+        consumerName: "payout-requested";
+        messageId: string;
+        payoutId: string;
+    }): Promise<void> {
+        if (this.messageIds.has(input.messageId)) return;
 
-        this.payoutIds.add(payoutId);
-        return true;
+        this.messageIds.add(input.messageId);
+        this.payoutIds.add(input.payoutId);
     }
 
     startedPayoutIds(): string[] {
         return [...this.payoutIds];
+    }
+
+    processedMessageIds(): string[] {
+        return [...this.messageIds];
     }
 }

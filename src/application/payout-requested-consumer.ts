@@ -3,15 +3,23 @@ export type PayoutRequestedMessage = {
     payoutId: string;
 };
 
-export interface PayoutDispatchStore {
-    startOnce(payoutId: string): Promise<boolean>;
+export interface PayoutRequestedProcessingStore {
+    processOnce(input: {
+        consumerName: "payout-requested";
+        messageId: string;
+        payoutId: string;
+    }): Promise<void>;
 }
 
 export class PayoutRequestedConsumer {
-    constructor(private readonly payoutDispatchStore: PayoutDispatchStore) {
+    constructor(private readonly store: PayoutRequestedProcessingStore) {
     }
 
     async handle(message: PayoutRequestedMessage): Promise<void> {
-        await this.payoutDispatchStore.startOnce(message.payoutId);
+        await this.store.processOnce({
+            consumerName: "payout-requested",
+            messageId: message.messageId,
+            payoutId: message.payoutId
+        });
     }
 }
