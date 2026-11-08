@@ -38,3 +38,10 @@ CREATE TABLE outbox_messages
     created_at     timestamptz NOT NULL DEFAULT NOW(),
     UNIQUE (aggregate_type, aggregate_id, type)
 );
+
+CREATE TABLE payout_dispatches (
+    id text PRIMARY KEY,
+    payout_id text NOT NULL UNIQUE REFERENCES payouts(id),
+    status text NOT NULL CHECK (status = 'STARTED'),
+    created_at timestamptz NOT NULL DEFAULT NOW()
+);
