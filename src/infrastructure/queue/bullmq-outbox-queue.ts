@@ -13,8 +13,17 @@ export class BullMqOutboxQueue implements OutboxQueue {
     async publish(message: ClaimedOutboxMessage): Promise<void> {
         await this.queue.add(message.type, message.payload, {
             jobId: message.id,
+            attempts: 5,
+            backoff: {
+                type: "exponential",
+                delay: 1_000
+            },
             removeOnComplete: false,
             removeOnFail: false
         });
+    }
+
+    close(): Promise<void> {
+        return this.queue.close();
     }
 }
