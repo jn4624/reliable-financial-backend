@@ -39,17 +39,38 @@ CREATE TABLE outbox_messages
     UNIQUE (aggregate_type, aggregate_id, type)
 );
 
-CREATE TABLE payout_dispatches (
-    id text PRIMARY KEY,
-    payout_id text NOT NULL UNIQUE REFERENCES payouts(id),
-    status text NOT NULL CHECK (status = 'STARTED'),
+CREATE TABLE payout_dispatches
+(
+    id         text PRIMARY KEY,
+    payout_id  text        NOT NULL UNIQUE REFERENCES payouts (id),
+    status     text        NOT NULL CHECK (status = 'STARTED'),
     created_at timestamptz NOT NULL DEFAULT NOW()
 );
 
-CREATE TABLE processed_messages (
-    consumer_name text NOT NULL,
-    message_id text NOT NULL,
-    payout_id text NOT NULL REFERENCES payouts(id),
-    processed_at timestamptz NOT NULL DEFAULT NOW(),
+CREATE TABLE processed_messages
+(
+    consumer_name text        NOT NULL,
+    message_id    text        NOT NULL,
+    payout_id     text        NOT NULL REFERENCES payouts (id),
+    processed_at  timestamptz NOT NULL DEFAULT NOW(),
     PRIMARY KEY (consumer_name, message_id)
+);
+
+CREATE TABLE chain_transactions
+(
+    id                text PRIMARY KEY,
+    payout_id         text           NOT NULL UNIQUE REFERENCES payouts (id),
+    sender_address    text           NOT NULL,
+    recipient_address text           NOT NULL,
+    amount_atomic     numeric(78, 0) NOT NULL CHECK (amount_atomic > 0),
+    nonce             bigint         NOT NULL,
+    status            text           NOT NULL CHECK (status IN ('CREATED', 'SIGNED', 'BROADCAST_UNKNOWN', 'PENDING',
+                                                                'MINED_SUCCESS',
+                                                                'MINED_REVERTED', 'CONFIRMED', 'FAILED')),
+    transaction_hash  text UNIQUE,
+    raw_transaction   text,
+    last_error        text,
+    created_at        timestamptz,
+    broadcast_at      timestamptz,
+    UNIQUE (sender_address, nonce)
 );
